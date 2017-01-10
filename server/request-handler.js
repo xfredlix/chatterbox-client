@@ -18,16 +18,17 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
-var resultsObj = {results: []};
-
+var objectId = 1;
+var resultsObj = {results: [{username: 'Thelegend27', text: 'Blaze it #blessed', objectId: objectId, roomname: 'lobby'}]};
 var requestHandler = function(request, response) {
   var statusCode = 200;
   var headers = defaultCorsHeaders;
 
-  console.log('Serving request type ' + request.method + ' for url ' + request.url);
+  var requestUrl = request.url.slice(0, 17);
+  console.log('Serving request type ' + request.method + ' for url ' + requestUrl);
 
   headers['Content-Type'] = 'jsonp';
-  if (request.url !== '/classes/messages') {
+  if (requestUrl !== '/classes/messages') {
     statusCode = 404;   
     response.writeHead(statusCode, headers);
     response.end();
@@ -46,11 +47,14 @@ var requestHandler = function(request, response) {
     });
   });
   promise.then((data) => {
+    objectId ++;
+    data.objectId = objectId;
     resultsObj.results.push(data);
     response.end(JSON.stringify(resultsObj));
+    console.log(resultsObj);
   }).catch((err) => {
     console.error(err);
   });
 };
 
-module.exports = requestHandler;
+module.exports.requestHandler = requestHandler;
