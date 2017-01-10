@@ -38,14 +38,17 @@ var requestHandler = function(request, response) {
   // console.log(request);
 
   // The outgoing status.
+  var resultsObj = {results: []};
   var statusCode = 200;
+  var headers = defaultCorsHeaders;
 
   if (request.method === 'POST') {
     statusCode = 201;
   }
-
+  request.on('data', function(data) {
+    resultsObj.results.push(JSON.parse(data.toString()));
+  });
   // See the note below about CORS headers.
-  var headers = defaultCorsHeaders;
 
   // Tell the client we are sending them plain text.
   //
@@ -65,7 +68,6 @@ var requestHandler = function(request, response) {
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
   
-  var resultsObj = {results: []};
 
   response.end(JSON.stringify(resultsObj));
 };
